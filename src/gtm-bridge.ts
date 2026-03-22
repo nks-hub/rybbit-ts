@@ -3,7 +3,6 @@ import { log } from "./logger";
 
 type DataLayerEntry = Record<string, unknown>;
 
-let observer: MutationObserver | null = null;
 let originalPush: ((...args: DataLayerEntry[]) => number) | null = null;
 
 /**
@@ -102,11 +101,6 @@ export function teardownGtmBridge(): void {
       .dataLayer as DataLayerEntry[];
     dataLayer.push = originalPush;
     originalPush = null;
-  }
-
-  if (observer) {
-    observer.disconnect();
-    observer = null;
   }
 
   log("GTM bridge teardown");

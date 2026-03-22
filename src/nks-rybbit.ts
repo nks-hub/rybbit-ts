@@ -179,7 +179,7 @@ export class NksRybbitSDK {
     };
     if (data.currency) props.currency = data.currency;
     if (data.items) {
-      props.items = data.items.map((i) => JSON.stringify(i));
+      props.items = JSON.stringify(data.items);
     }
     this.event("purchase", props);
   }
