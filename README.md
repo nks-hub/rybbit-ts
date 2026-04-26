@@ -84,6 +84,38 @@ nksRybbit.trackPurchase({
 
 ---
 
+## Bot Detection & E2E Testing
+
+Since Rybbit `v2.5` the analytics script ships an automatic client-side bot
+score (`_bs`). The server silently drops events when it considers the request
+a bot — including all of these patterns:
+
+- `navigator.webdriver === true` (Selenium / Playwright / Puppeteer default)
+- Headless Chrome (SwiftShader WebGL renderer, missing `window.chrome`, no plugins)
+- `outerWidth/outerHeight === 0`, `connection.rtt === 0`
+- Server-side: viewport `800×600` on a desktop User-Agent (Puppeteer default)
+
+The SDK does not build payloads itself — the server-served `script.js` adds
+`_bs` automatically — so existing integrations stop seeing automated traffic
+without any code change.
+
+**For your own E2E tests**, set `dryRun: true` so the SDK never loads
+`script.js` and instead logs every call locally:
+
+```typescript
+await nksRybbit.boot({
+  host: 'https://demo.rybbit.com',
+  siteId: 'your-site-id',
+  dryRun: process.env.NODE_ENV === 'test',
+});
+```
+
+Without `dryRun`, your Playwright/Puppeteer test runs will be flagged as bots
+and silently dropped (the request still returns `200 OK` but with
+`message: "bot detected"` — no error surfaces in the browser).
+
+---
+
 ## Documentation
 
 Comprehensive guides to get you up and running:
