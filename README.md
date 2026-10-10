@@ -6,26 +6,24 @@
 [![Node.js](https://img.shields.io/badge/Node.js-16+-339933.svg?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-> Privacy-first analytics SDK for TypeScript - A modern wrapper for [Rybbit Analytics](https://rybbit.io) with typed events, GTM integration, and zero-configuration setup.
-
-**Privacy-first. Cookieless. No consent popups needed.** Rybbit Analytics provides GDPR-compliant, cookieless tracking without requiring user consent dialogs.
+> TypeScript wrapper for [Rybbit Analytics](https://rybbit.io) with typed events, Google Tag Manager forwarding and an event queue.
 
 ## Features
 
-- 🍪 **Zero cookies** - No consent banners required
-- 🔀 **3 Loading Strategies** - Script injection, @rybbit/js SDK integration, or auto-detect — works with any setup
-- 📥 **Event Queuing** - Buffers events before SDK ready, replays on initialization, so no events are lost during initialization
-- 🏷️ **Typed Events** - Full TypeScript support for GA4-compatible events (purchase, add_to_cart, view_item, etc.)
-- 🏗️ **GTM Bridge** - Auto-forward Google Tag Manager dataLayer events to Rybbit
-- 👤 **User Identification** - Automatic user ID extraction from server-rendered DOM
-- 🧪 **Dry-run Mode** - Test integration by logging events without sending
-- 🎥 **Session Replay** - Programmatic control over session recording
+- 🍪 **No cookies** - The SDK writes none, and Rybbit tracks without them
+- 🔀 **Three loading strategies** - Injects the script tag, uses the @rybbit/js SDK, or detects which one the page already has
+- 📥 **Event queue** - Buffers events sent before the SDK is ready and replays them after initialization
+- 🏷️ **Typed events** - TypeScript types for GA4-compatible events (purchase, add_to_cart, view_item, etc.)
+- 🏗️ **GTM bridge** - Forwards Google Tag Manager dataLayer events to Rybbit
+- 👤 **User identification** - Reads the user ID from the server-rendered DOM
+- 🧪 **Dry-run mode** - Logs events to the console instead of sending them
+- 🎥 **Session replay** - Starts and stops session recording from code
 
 ## Requirements
 
 - **Node.js**: 16+ recommended
 - **TypeScript**: 5.0+ (for TypeScript projects)
-- **Browsers**: Modern browsers with ES6 support
+- **Browsers**: ES6 support
 
 ## Installation
 
@@ -57,7 +55,7 @@ nksRybbit.trackPurchase({
 });
 ```
 
-### Script Tag (IIFE)
+### Script tag (IIFE)
 
 ```html
 <script src="https://cdn.example.com/nks-rybbit.iife.min.js"></script>
@@ -92,20 +90,20 @@ await nksRybbit.boot({
 });
 ```
 
-## Bot Detection & E2E Testing
+## Bot detection and E2E testing
 
 Since Rybbit `v2.5` the analytics script ships an automatic client-side bot
-score (`_bs`). The server silently drops events when it considers the request
-a bot — including all of these patterns:
+score (`_bs`). The server silently drops events it considers bot traffic,
+including these patterns:
 
 - `navigator.webdriver === true` (Selenium / Playwright / Puppeteer default)
 - Headless Chrome (SwiftShader WebGL renderer, missing `window.chrome`, no plugins)
 - `outerWidth/outerHeight === 0`, `connection.rtt === 0`
 - Server-side: viewport `800×600` on a desktop User-Agent (Puppeteer default)
 
-The SDK does not build payloads itself — the server-served `script.js` adds
-`_bs` automatically — so existing integrations stop seeing automated traffic
-without any code change.
+The SDK does not build payloads itself. The `script.js` served by Rybbit adds
+`_bs`, so existing integrations stop recording automated traffic without a
+code change.
 
 **For your own E2E tests**, set `dryRun: true` so the SDK never loads
 `script.js` and instead logs every call locally:
@@ -120,25 +118,23 @@ await nksRybbit.boot({
 
 Without `dryRun`, your Playwright/Puppeteer test runs will be flagged as bots
 and silently dropped (the request still returns `200 OK` but with
-`message: "bot detected"` — no error surfaces in the browser).
+`message: "bot detected"`, and no error shows up in the browser).
 
 ## Documentation
 
-Comprehensive guides to get you up and running:
-
 | Guide | Description |
 |-------|-------------|
-| [Getting Started](docs/getting-started.md) | Installation, configuration, and loading strategies |
-| [Events Reference](docs/events.md) | Complete catalog of typed events with examples |
+| [Getting started](docs/getting-started.md) | Installation, configuration, and loading strategies |
+| [Events reference](docs/events.md) | Catalog of typed events with examples |
 | [GTM Bridge](docs/gtm-bridge.md) | Google Tag Manager integration guide |
-| [API Reference](docs/api.md) | Full SDK API documentation |
-| [Examples](docs/examples.md) | Real-world integration examples |
+| [API reference](docs/api.md) | SDK API documentation |
+| [Examples](docs/examples.md) | Integration examples |
 
-## Build Outputs
+## Build outputs
 
 | File | Format | Size | Use Case |
 |------|--------|------|----------|
-| `dist/index.esm.js` | ESM | ~24 KB | Modern bundlers (Vite, webpack, Rollup) |
+| `dist/index.esm.js` | ESM | ~24 KB | Bundlers (Vite, webpack, Rollup) |
 | `dist/index.js` | CJS | ~25 KB | Node.js / require() imports |
 | `dist/index.iife.js` | IIFE | ~26 KB | Direct script tag (development) |
 | `dist/index.iife.min.js` | IIFE | ~13 KB | Direct script tag (production) |
