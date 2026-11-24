@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.1.1 — 2026-04-26
+## 0.1.1 — 2026-11-24
+
+### Maintenance
+
+- Dev dependency vitest upgraded to 4.1 (replaces the vulnerable tinypool it pulled in). No runtime change.
 
 ### Compatibility
 
